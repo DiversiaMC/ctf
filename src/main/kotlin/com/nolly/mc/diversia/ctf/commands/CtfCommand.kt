@@ -299,7 +299,6 @@ class CtfCommand(
 			if (sender is Player) TextAPI.send(sender, config.messages.invalidUsage.replace("{usage}", "/$label flag <add|remove|list>"))
 			return true
 		}
-
 		return when (args[0].lowercase()) {
 			"add" -> {
 				if (sender !is Player) {
@@ -402,7 +401,6 @@ class CtfCommand(
 			if (sender is Player) TextAPI.send(sender, config.messages.invalidUsage.replace("{usage}", "/$label kit <add|remove|list|give|assign>"))
 			return true
 		}
-
 		return when (args[0].lowercase()) {
 			"add" -> {
 				if (sender !is Player) {
@@ -464,7 +462,6 @@ class CtfCommand(
 				true
 			}
 			"assign" -> {
-				// /ctf kit assign <kitId> <teamId>
 				if (args.size < 3) {
 					if (sender is Player) TextAPI.send(sender, config.messages.invalidUsage.replace("{usage}", "/$label kit assign <kitId> <teamId>"))
 					return true
