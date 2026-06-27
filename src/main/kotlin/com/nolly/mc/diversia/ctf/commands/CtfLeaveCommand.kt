@@ -23,13 +23,14 @@ class CtfLeaveCommand(
 			return true
 		}
 
-		if (!game.isInGame(sender.uniqueId)) {
+		val team = game.teamManager.getPlayerTeam(sender.uniqueId)
+		if (team == null) {
 			TextAPI.send(sender, config.messages.notInTeam)
 			return true
 		}
 
 		game.leaveTeam(sender)
-		TextAPI.send(sender, config.messages.leftTeam.replace("{team}", ""))
+		TextAPI.send(sender, config.messages.leftTeam.replace("{team}", team.displayName))
 		return true
 	}
 }

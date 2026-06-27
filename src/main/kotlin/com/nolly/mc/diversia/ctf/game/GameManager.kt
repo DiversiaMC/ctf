@@ -58,6 +58,7 @@ class GameManager(
 		lockedInBox.addAll(ctfPlayers.keys)
 
 		giveAllKits()
+		setNonTeamPlayersToSpectator()
 		startParticleTask()
 		startCaptureCheckTask()
 
@@ -377,6 +378,14 @@ class GameManager(
 					player.teleport(loc)
 				}
 			}
+	}
+
+	private fun setNonTeamPlayersToSpectator() {
+		Bukkit.getOnlinePlayers().forEach { player ->
+			if (isInGame(player.uniqueId)) return@forEach
+			if (player.gameMode == GameMode.CREATIVE) return@forEach
+			player.gameMode = GameMode.SPECTATOR
+		}
 	}
 
 	private fun teleportToLobby(player: Player) {
