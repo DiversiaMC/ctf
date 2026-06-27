@@ -214,9 +214,7 @@ class GameManager(
 		checkWinCondition()
 	}
 
-	fun getCtfPlayer(uuid: UUID): CtfPlayer? = ctfPlayers[uuid]
 	fun isInGame(uuid: UUID): Boolean = ctfPlayers.containsKey(uuid)
-	fun getAllCtfPlayers(): Collection<CtfPlayer> = ctfPlayers.values
 
 	private fun checkWinCondition() {
 		val condition = config.winCondition.uppercase()
@@ -360,10 +358,25 @@ class GameManager(
 	}
 
 	private fun teleportAllToLobby() {
-		val lobby = config.lobbyLocation ?: return
-		val world = Bukkit.getWorld(lobby.world) ?: return
-		val loc = Location(world, lobby.x, lobby.y, lobby.z, lobby.yaw, lobby.pitch)
-		Bukkit.getOnlinePlayers().forEach { it.teleport(loc) }
+		val lobbyData = config.lobbyLocation ?: return
+		val world = Bukkit.getWorld(lobbyData.world) ?: return
+		val loc = Location(world, lobbyData.x, lobbyData.y, lobbyData.z, lobbyData.yaw, lobbyData.pitch)
+
+		ctfPlayers.keys.forEach { uuid ->
+			Bukkit.getPlayer(uuid)?.let { player ->
+				player.gameMode = GameMode.SURVIVAL
+				player.teleport(loc)
+			}
+		}
+
+		Bukkit.getOnlinePlayers()
+			.filter { it.uniqueId !in ctfPlayers }
+			.forEach { player ->
+				if (player.gameMode == GameMode.SPECTATOR) {
+					player.gameMode = GameMode.SURVIVAL
+					player.teleport(loc)
+				}
+			}
 	}
 
 	private fun teleportToLobby(player: Player) {

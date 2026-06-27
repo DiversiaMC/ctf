@@ -2,6 +2,7 @@ package com.nolly.mc.diversia.ctf.listeners
 
 import com.nolly.mc.diversia.ctf.game.GameManager
 import com.nolly.mc.diversia.ctf.model.GameState
+import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -129,8 +130,13 @@ class GameListener(private val game: GameManager) : Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	fun onPlayerJoin(event: PlayerJoinEvent) {
-		if (game.state == GameState.RUNNING || game.state == GameState.PAUSED) {
-			game.addPlayerToBossBar(event.player)
+		val player = event.player
+		when (game.state) {
+			GameState.RUNNING, GameState.PAUSED -> {
+				player.gameMode = GameMode.SPECTATOR
+				game.addPlayerToBossBar(player)
+			}
+			else -> {}
 		}
 	}
 }
