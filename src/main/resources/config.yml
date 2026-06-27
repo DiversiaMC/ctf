@@ -1,0 +1,86 @@
+prefix: "<gradient:#ff4444:#ff8800>CTF</gradient> <gray>»</gray>"
+
+lobby:
+  world: "world"
+  x: 0.5
+  y: 64.0
+  z: 0.5
+  yaw: 0.0
+  pitch: 0.0
+
+game:
+  time-limit-seconds: 600
+  max-score: 3
+  win-condition: "BOTH"
+  respawn-delay-seconds: 5
+  friendly-fire: false
+  flag-return-delay-seconds: 30
+  flag-particle: "FLAME"
+  flag-carrier-particle: "CRIT"
+  flag-item: "WHITE_BANNER"
+  gamemode: "ADVENTURE"
+
+teams: {}
+flags: {}
+spawns: {}
+
+kits: {}
+
+messages:
+  no-permission: "{prefix} <red>You do not have permission.</red>"
+  players-only: "{prefix} <red>Only players can use this command.</red>"
+  invalid-usage: "{prefix} <red>Usage: <white>{usage}</white></red>"
+  reload: "{prefix} <green>CTF configuration reloaded.</green>"
+
+  game-already-running: "{prefix} <red>A game is already running.</red>"
+  game-not-running: "{prefix} <red>No game is currently running.</red>"
+  game-not-setup: "{prefix} <red>Game is not in setup mode.</red>"
+  game-not-waiting: "{prefix} <red>Game is not in waiting state.</red>"
+  game-started: "{prefix} <green>Game started!</green>"
+  game-stopped: "{prefix} <yellow>Game stopped.</yellow>"
+  game-reset: "{prefix} <green>Game reset.</green>"
+  game-paused: "{prefix} <yellow>Game paused.</yellow>"
+  game-resumed: "{prefix} <green>Game resumed.</green>"
+  game-win-score: "<gradient:#ffaa00:#ff4444>{team}</gradient> <green>wins by reaching <white>{score}</white> captures!</green>"
+  game-win-time: "<gradient:#ffaa00:#ff4444>{team}</gradient> <green>wins at time end with <white>{score}</white> captures!</green>"
+  game-tie: "<gray>Game ended in a <white>tie</white>.</gray>"
+
+  team-created: "{prefix} <green>Team <white>{team}</white> created.</green>"
+  team-removed: "{prefix} <green>Team <white>{team}</white> removed.</green>"
+  team-not-found: "{prefix} <red>Team <white>{team}</white> not found.</red>"
+  team-already-exists: "{prefix} <red>Team <white>{team}</white> already exists.</red>"
+  team-assigned: "{prefix} <green><white>{player}</white> assigned to <white>{team}</white>.</green>"
+
+  flag-placed: "{prefix} <green>Flag <white>{flag}</white> placed for team <white>{team}</white>.</green>"
+  flag-removed: "{prefix} <green>Flag <white>{flag}</white> removed.</green>"
+  flag-not-found: "{prefix} <red>Flag <white>{flag}</white> not found.</red>"
+  flag-already-exists: "{prefix} <red>Flag <white>{flag}</white> already exists.</red>"
+  flag-picked-up: "<gradient:#ffaa00:#ff4444>{player}</gradient> <yellow>picked up <white>{team}</white>'s flag!</yellow>"
+  flag-dropped: "<gradient:#ffaa00:#ff4444>{player}</gradient> <yellow>dropped <white>{team}</white>'s flag!</yellow>"
+  flag-returned: "<white>{team}</white>'s flag <green>has returned to base.</green>"
+  flag-captured: "<gradient:#ffaa00:#ff4444>{player}</gradient> <green>captured <white>{team}</white>'s flag! <white>({score})</white></green>"
+
+  spawn-set: "{prefix} <green>Spawn for team <white>{team}</white> set.</green>"
+  lobby-set: "{prefix} <green>Lobby spawn set.</green>"
+
+  joined-team: "{prefix} <green>You joined team <white>{team}</white>.</green>"
+  left-team: "{prefix} <yellow>You left team <white>{team}</white>.</yellow>"
+  not-in-team: "{prefix} <red>You are not in a team.</red>"
+  team-full: "{prefix} <red>Team <white>{team}</white> is full.</red>"
+  game-not-joinable: "{prefix} <red>The game is not accepting players right now.</red>"
+
+  respawn-countdown: "<yellow>Respawning in <white>{seconds}</white>...</yellow>"
+  respawn-now: "<green>Respawned!</green>"
+
+  kit-given: "{prefix} <green>Kit <white>{kit}</white> applied.</green>"
+  kit-not-found: "{prefix} <red>Kit <white>{kit}</white> not found.</red>"
+  kit-already-exists: "{prefix} <red>Kit <white>{kit}</white> already exists.</red>"
+  kit-created: "{prefix} <green>Kit <white>{kit}</white> saved from your current inventory.</green>"
+  kit-removed: "{prefix} <green>Kit <white>{kit}</white> removed.</green>"
+  kit-assigned: "{prefix} <green>Kit <white>{kit}</white> assigned to team <white>{team}</white>.</green>"
+
+  status-header: "{prefix} <gray>Game status:</gray>"
+  status-state: "<gray>State: <white>{state}</white>"
+  status-time: "<gray>Time left: <white>{time}</white>"
+  status-scores: "<gray>Scores:</gray>"
+  status-score-entry: " <gray>- <white>{team}</white>: <aqua>{score}</aqua>"

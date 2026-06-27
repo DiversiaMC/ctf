@@ -1,0 +1,44 @@
+name: diversia-ctf
+version: "${version}"
+
+main: com.nolly.mc.diversia.ctf.DiversiaCtf
+api-version: "1.21"
+author: Nolly
+description: Capture The Flag game plugin for Diversia
+website: https://github.com/thenolle
+
+depend:
+  - TextAPI
+
+commands:
+  ctf:
+    description: Game Master CTF management
+    usage: /<command> <subcommand>
+    permission: diversia.ctf.master
+    permission-message: You do not have permission to use this command.
+  ctfjoin:
+    description: Join a CTF team
+    usage: /<command> <team>
+    permission: diversia.ctf.join
+    permission-message: You do not have permission to use this command.
+  ctfleave:
+    description: Leave your current CTF team
+    usage: /<command>
+    permission: diversia.ctf.join
+    permission-message: You do not have permission to use this command.
+
+permissions:
+  diversia.ctf.*:
+    description: Full access to Diversia CTF
+    default: op
+    children:
+      diversia.ctf.master: true
+      diversia.ctf.join: true
+
+  diversia.ctf.master:
+    description: Game Master access — full game control
+    default: op
+
+  diversia.ctf.join:
+    description: Join/leave CTF teams
+    default: true
