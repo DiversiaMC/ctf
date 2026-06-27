@@ -2,6 +2,7 @@ package com.nolly.mc.diversia.ctf.commands
 
 import com.nolly.mc.diversia.ctf.config.CtfConfig
 import com.nolly.mc.diversia.ctf.game.GameManager
+import com.nolly.mc.diversia.ctf.model.GameState
 import com.nolly.mc.textapi.api.TextAPI
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -20,6 +21,11 @@ class CtfLeaveCommand(
 	): Boolean {
 		if (sender !is Player) {
 			sender.sendMessage(TextAPI.parse(config.messages.playersOnly))
+			return true
+		}
+
+		if (game.state == GameState.RUNNING || game.state == GameState.PAUSED) {
+			TextAPI.send(sender, config.messages.gameNotJoinable)
 			return true
 		}
 

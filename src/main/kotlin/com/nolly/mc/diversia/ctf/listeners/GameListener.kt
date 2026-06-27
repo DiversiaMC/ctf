@@ -151,9 +151,12 @@ class GameListener(private val game: GameManager) : Listener {
 	fun onPlayerJoin(event: PlayerJoinEvent) {
 		val player = event.player
 		player.teleport(game.config.resolveLobbyLocation())
+
 		when (game.state) {
 			GameState.RUNNING, GameState.PAUSED -> {
-				player.gameMode = GameMode.SPECTATOR
+				if (player.gameMode != GameMode.CREATIVE) {
+					player.gameMode = GameMode.SPECTATOR
+				}
 				game.addPlayerToBossBar(player)
 			}
 			else -> {}
