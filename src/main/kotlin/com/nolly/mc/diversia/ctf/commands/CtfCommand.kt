@@ -57,11 +57,37 @@ class CtfCommand(
 			"spawn" -> handleSpawn(sender, args.drop(1))
 			"lobby" -> handleLobby(sender)
 			"kit" -> handleKit(sender, args.drop(1), label)
+			"openjoin" -> handleOpenJoin(sender, args.drop(1))
 			else -> {
 				sendUsage(sender, label)
 				true
 			}
 		}
+	}
+
+	@Suppress("SameReturnValue")
+	private fun handleOpenJoin(sender: CommandSender, args: List<String>): Boolean {
+		if (args.isEmpty()) {
+			val newValue = !config.openJoin
+			config.setOpenJoin(newValue)
+			val state = if (newValue) "<green>activated</green>" else "<red>deactivated</red>"
+			if (sender is Player) TextAPI.send(sender, "<gray>Join : $state</gray>")
+			else sender.sendMessage(TextAPI.parse("<gray>Open join: $state</gray>"))
+			return true
+		}
+		val value = when (args[0].lowercase()) {
+			"true", "on", "yes" -> true
+			"false", "off", "no" -> false
+			else -> {
+				if (sender is Player) TextAPI.send(sender, config.messages.invalidUsage.replace("{usage}", "/ctf openjoin [true|false]"))
+				return true
+			}
+		}
+		config.setOpenJoin(value)
+		val state = if (value) "<green>activated</green>" else "<red>deactivated</red>"
+		if (sender is Player) TextAPI.send(sender, "<gray>Join : $state</gray>")
+		else sender.sendMessage(TextAPI.parse("<gray>Open join: $state</gray>"))
+		return true
 	}
 
 	override fun onTabComplete(
@@ -75,12 +101,13 @@ class CtfCommand(
 		val top = listOf(
 			"setup", "waiting", "start", "pause", "resume",
 			"stop", "reset", "reload", "status",
-			"team", "flag", "spawn", "lobby", "kit"
+			"team", "flag", "spawn", "lobby", "kit", "openjoin"
 		)
 
 		if (args.size == 1) return filterCompletions(args[0], top)
 
 		return when (args[0].lowercase()) {
+			"openjoin" -> if (args.size == 2) filterCompletions(args[1], listOf("true", "false")) else emptyList()
 			"team" -> when (args.size) {
 				2 -> filterCompletions(args[1], listOf("add", "remove", "list", "assign"))
 				3 -> when (args[1].lowercase()) {

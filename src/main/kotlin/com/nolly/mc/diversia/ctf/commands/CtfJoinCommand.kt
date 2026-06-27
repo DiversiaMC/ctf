@@ -25,6 +25,11 @@ class CtfJoinCommand(
 			return true
 		}
 
+		if (!config.openJoin) {
+			TextAPI.send(sender, config.messages.gameNotJoinable)
+			return true
+		}
+
 		if (game.state !in listOf(GameState.SETUP, GameState.WAITING)) {
 			TextAPI.send(sender, config.messages.gameNotJoinable)
 			return true
@@ -51,6 +56,7 @@ class CtfJoinCommand(
 			return true
 		}
 
+		sender.teleport(config.resolveLobbyLocation())
 		TextAPI.send(sender, config.messages.joinedTeam.replace("{team}", teamId))
 		return true
 	}

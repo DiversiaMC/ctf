@@ -21,36 +21,29 @@ class RespawnManager(
 		val uuid = player.uniqueId
 		val teamId = teamManager.getPlayerTeam(uuid)?.id ?: return
 		val spawnData = config.loadSpawn(teamId) ?: return
-
 		player.gameMode = GameMode.SPECTATOR
 		var remaining = config.respawnDelaySeconds
-
 		val taskId = Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
 			val online = Bukkit.getPlayer(uuid) ?: run {
 				pending[uuid]?.let { Bukkit.getScheduler().cancelTask(it) }
 				pending.remove(uuid)
 				return@Runnable
 			}
-
 			if (remaining > 0) {
 				TextAPI.send(online, config.messages.respawnCountdown.replace("{seconds}", remaining.toString()))
 				remaining--
 				return@Runnable
 			}
-
 			pending[uuid]?.let { Bukkit.getScheduler().cancelTask(it) }
 			pending.remove(uuid)
-
 			val world = Bukkit.getWorld(spawnData.world) ?: return@Runnable
 			val loc = Location(world, spawnData.x, spawnData.y, spawnData.z, spawnData.yaw, spawnData.pitch)
 			online.teleport(loc)
 			online.gameMode = GameMode.ADVENTURE
-			online.health = online.maxHealth
+			online.health = 20.0
 			online.foodLevel = 20
-
 			val team = teamManager.getTeam(teamId)
 			team?.kitId?.let { kitId -> kitManager.applyKit(kitId, online) }
-
 			TextAPI.send(online, config.messages.respawnNow)
 		}, 0L, 20L).taskId
 
@@ -65,5 +58,12 @@ class RespawnManager(
 	fun cancel(uuid: UUID) {
 		pending[uuid]?.let { Bukkit.getScheduler().cancelTask(it) }
 		pending.remove(uuid)
+	}
+
+	fun teleportToSpawn(player: Player) {
+		val teamId = teamManager.getPlayerTeam(player.uniqueId)?.id ?: return
+		val spawnData = config.loadSpawn(teamId) ?: return
+		val world = Bukkit.getWorld(spawnData.world) ?: return
+		player.teleport(Location(world, spawnData.x, spawnData.y, spawnData.z, spawnData.yaw, spawnData.pitch))
 	}
 }

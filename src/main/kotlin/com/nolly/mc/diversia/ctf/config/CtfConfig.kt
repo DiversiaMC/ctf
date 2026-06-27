@@ -3,6 +3,7 @@ package com.nolly.mc.diversia.ctf.config
 import com.nolly.mc.diversia.ctf.model.CtfFlag
 import com.nolly.mc.diversia.ctf.model.CtfKit
 import com.nolly.mc.diversia.ctf.model.CtfTeam
+import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.inventory.ItemStack
@@ -20,6 +21,24 @@ class CtfConfig(private val plugin: JavaPlugin) {
 	init { reload() }
 
 	val prefix: String get() = mainConfig.getString("prefix").orEmpty()
+
+	val openJoin: Boolean get() = mainConfig.getBoolean("game.open-join", true)
+
+	fun setOpenJoin(value: Boolean) {
+		mainConfig.set("game.open-join", value)
+		plugin.saveConfig()
+	}
+
+	fun resolveLobbyLocation(): Location {
+		val data = lobbyLocation
+		if (data != null) {
+			val world = Bukkit.getWorld(data.world)
+			if (world != null) {
+				return Location(world, data.x, data.y, data.z, data.yaw, data.pitch)
+			}
+		}
+		return Bukkit.getWorlds().first().spawnLocation
+	}
 
 	val messages: MessagesConfig
 		get() = MessagesConfig(
