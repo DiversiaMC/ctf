@@ -26,6 +26,11 @@ commands:
     usage: /<command>
     permission: diversia.ctf.join
     permission-message: You do not have permission to use this command.
+  ctfkit:
+    description: Choose your personal kit before the game starts
+    usage: /ctfkit [kitId|clear]
+    permission: diversia.ctf.join
+    permission-message: You do not have permission to use this command.
 
 permissions:
   diversia.ctf.*:

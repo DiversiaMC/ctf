@@ -57,6 +57,7 @@ class CtfCommand(
 			"spawn" -> handleSpawn(sender, args.drop(1))
 			"lobby" -> handleLobby(sender)
 			"kit" -> handleKit(sender, args.drop(1), label)
+			"playerkit" -> handlePlayerKit(sender, args.drop(1), label)
 			"openjoin" -> handleOpenJoin(sender, args.drop(1))
 			else -> {
 				sendUsage(sender, label)
@@ -90,6 +91,57 @@ class CtfCommand(
 		return true
 	}
 
+	@Suppress("SameReturnValue")
+	private fun handlePlayerKit(sender: CommandSender, args: List<String>, label: String): Boolean {
+		if (args.size < 2) {
+			if (sender is Player) TextAPI.send(sender, config.messages.invalidUsage.replace("{usage}", "/$label playerkit <set|clear|get> <player> [kitId]"))
+			return true
+		}
+
+		val target = org.bukkit.Bukkit.getPlayerExact(args[1])
+		if (target == null) {
+			if (sender is Player) TextAPI.send(sender, "<red>Player not found.</red>")
+			return true
+		}
+
+		return when (args[0].lowercase()) {
+			"set" -> {
+				if (args.size < 3) {
+					if (sender is Player) TextAPI.send(sender, config.messages.invalidUsage.replace("{usage}", "/$label playerkit set <player> <kitId>"))
+					return true
+				}
+				val kitId = args[2].lowercase()
+				if (!game.kitManager.hasKit(kitId)) {
+					if (sender is Player) TextAPI.send(sender, config.messages.kitNotFound.replace("{kit}", kitId))
+					return true
+				}
+				if (!game.setPlayerKit(target.uniqueId, kitId)) {
+					if (sender is Player) TextAPI.send(sender, "<red>${target.name} has not joined a team yet.</red>")
+					return true
+				}
+				if (sender is Player) TextAPI.send(sender, "<gray>Kit <white>$kitId</white> assigned to <white>${target.name}</white>.</gray>")
+				true
+			}
+			"clear" -> {
+				if (!game.setPlayerKit(target.uniqueId, null)) {
+					if (sender is Player) TextAPI.send(sender, "<red>${target.name} has not joined a team yet.</red>")
+					return true
+				}
+				if (sender is Player) TextAPI.send(sender, "<gray>Personal kit cleared for <white>${target.name}</white>. Team kit will be used.</gray>")
+				true
+			}
+			"get" -> {
+				val kitId = game.getPlayerKit(target.uniqueId)
+				if (sender is Player) TextAPI.send(sender, "<gray>${target.name}'s kit: <white>${kitId ?: "none (uses team kit)"}</white></gray>")
+				true
+			}
+			else -> {
+				sendUsage(sender, label)
+				true
+			}
+		}
+	}
+
 	override fun onTabComplete(
 		sender: CommandSender,
 		command: Command,
@@ -101,7 +153,7 @@ class CtfCommand(
 		val top = listOf(
 			"setup", "waiting", "start", "pause", "resume",
 			"stop", "reset", "reload", "status",
-			"team", "flag", "spawn", "lobby", "kit", "openjoin"
+			"team", "flag", "spawn", "lobby", "kit", "openjoin", "playerkit"
 		)
 
 		if (args.size == 1) return filterCompletions(args[0], top)
@@ -148,6 +200,15 @@ class CtfCommand(
 					"assign" -> filterCompletions(args[3], teamIds())
 					else -> emptyList()
 				}
+				else -> emptyList()
+			}
+			"playerkit" -> when (args.size) {
+				2 -> filterCompletions(args[1], listOf("set", "clear", "get"))
+				3 -> when (args[1].lowercase()) {
+					"set", "clear", "get" -> filterCompletions(args[2], onlinePlayerNames())
+					else -> emptyList()
+				}
+				4 -> if (args[1].lowercase() == "set") filterCompletions(args[3], kitIds()) else emptyList()
 				else -> emptyList()
 			}
 			else -> emptyList()

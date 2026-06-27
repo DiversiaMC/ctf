@@ -16,6 +16,7 @@ class RespawnManager(
 	private val kitManager: KitManager
 ) {
 	private val pending = mutableMapOf<UUID, Int>()
+	var kitResolver: ((UUID) -> String?)? = null
 
 	fun scheduleRespawn(player: Player) {
 		val uuid = player.uniqueId
@@ -43,7 +44,8 @@ class RespawnManager(
 			online.health = 20.0
 			online.foodLevel = 20
 			val team = teamManager.getTeam(teamId)
-			team?.kitId?.let { kitId -> kitManager.applyKit(kitId, online) }
+			val kitId = kitResolver?.invoke(uuid) ?: team?.kitId
+			kitId?.let { kitManager.applyKit(it, online) }
 			TextAPI.send(online, config.messages.respawnNow)
 		}, 0L, 20L).taskId
 

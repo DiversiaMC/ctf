@@ -353,9 +353,16 @@ class GameManager(
 	private fun giveAllKits() {
 		ctfPlayers.values.forEach { ctfPlayer ->
 			val player = Bukkit.getPlayer(ctfPlayer.uuid) ?: return@forEach
-			val kitId = teamManager.getTeam(ctfPlayer.teamId)?.kitId ?: return@forEach
+			val kitId = ctfPlayer.kitId ?: teamManager.getTeam(ctfPlayer.teamId)?.kitId ?: return@forEach
 			kitManager.applyKit(kitId, player)
 		}
+	}
+
+	fun getPlayerKit(uuid: UUID): String? = ctfPlayers[uuid]?.kitId
+	fun setPlayerKit(uuid: UUID, kitId: String?): Boolean {
+		val ctfPlayer = ctfPlayers[uuid] ?: return false
+		ctfPlayer.kitId = kitId
+		return true
 	}
 
 	private fun teleportAllToLobby() {

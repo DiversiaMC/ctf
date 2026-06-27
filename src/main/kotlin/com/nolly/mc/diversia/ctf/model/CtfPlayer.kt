@@ -9,7 +9,8 @@ data class CtfPlayer(
 	var isAlive: Boolean = true,
 	var carriedFlagId: String? = null,
 	var savedInventory: Array<ItemStack?> = arrayOfNulls(41),
-	var captures: Int = 0
+	var captures: Int = 0,
+	var kitId: String? = null
 ) {
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
@@ -20,6 +21,7 @@ data class CtfPlayer(
 		if (uuid != other.uuid) return false
 		if (teamId != other.teamId) return false
 		if (carriedFlagId != other.carriedFlagId) return false
+		if (kitId != other.kitId) return false
 		if (!savedInventory.contentEquals(other.savedInventory)) return false
 		return true
 	}
@@ -30,6 +32,7 @@ data class CtfPlayer(
 		result = 31 * result + uuid.hashCode()
 		result = 31 * result + teamId.hashCode()
 		result = 31 * result + (carriedFlagId?.hashCode() ?: 0)
+		result = 31 * result + (kitId?.hashCode() ?: 0)
 		result = 31 * result + savedInventory.contentHashCode()
 		return result
 	}
