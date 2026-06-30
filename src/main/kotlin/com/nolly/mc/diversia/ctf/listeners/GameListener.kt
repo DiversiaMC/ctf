@@ -20,24 +20,50 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.event.player.PlayerRespawnEvent
+import org.bukkit.event.player.PlayerSwapHandItemsEvent // Added for handling 'F' key swap
 import org.bukkit.inventory.EquipmentSlot
 
 class GameListener(private val game: GameManager) : Listener {
 	private val activeStates = setOf(GameState.RUNNING, GameState.PAUSED, GameState.WAITING)
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	fun onEntityDamage(event: EntityDamageEvent) {
 		val player = event.entity as? Player ?: return
-		if (!game.isInGame(player.uniqueId)) {
+		if (!game.isInGame(player.uniqueId)) return
+		if (game.state != GameState.RUNNING) {
 			event.isCancelled = true
 			return
 		}
-		if (game.state != GameState.RUNNING) return
+		if (event is EntityDamageByEntityEvent) {
+			val attacker = event.damager as? Player
+			if (attacker != null) {
+				if (!game.isInGame(attacker.uniqueId)) {
+					event.isCancelled = true
+					return
+				}
+				val victimTeam = game.teamManager.getPlayerTeam(player.uniqueId)?.id
+				val attackerTeam = game.teamManager.getPlayerTeam(attacker.uniqueId)?.id
+				if (victimTeam != null && victimTeam == attackerTeam) {
+					event.isCancelled = true
+					return
+				} else {
+					event.isCancelled = false
+				}
+			}
+		}
+		if (event.isCancelled) return
 		if (player.health - event.finalDamage > 0) return
 		event.isCancelled = true
 		player.health = 20.0
 		game.respawnManager.teleportToSpawn(player)
 		game.handleDeath(player)
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	fun onPlayerSwapHandItems(event: PlayerSwapHandItemsEvent) {
+		if (!game.isInGame(event.player.uniqueId)) return
+		if (game.state !in activeStates) return
+		event.isCancelled = true
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -123,22 +149,6 @@ class GameListener(private val game: GameManager) : Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	fun onEntityDamageByEntity(event: EntityDamageByEntityEvent) {
-		val victim = event.entity as? Player ?: return
-		val attacker = event.damager as? Player ?: return
-		if (!game.isInGame(attacker.uniqueId) || !game.isInGame(victim.uniqueId)) {
-			event.isCancelled = true
-			return
-		}
-		if (game.state != GameState.RUNNING) return
-		val victimTeam = game.teamManager.getPlayerTeam(victim.uniqueId)?.id
-		val attackerTeam = game.teamManager.getPlayerTeam(attacker.uniqueId)?.id
-		if (victimTeam != null && victimTeam == attackerTeam) {
-			event.isCancelled = true
-		}
-	}
-
 	@EventHandler(priority = EventPriority.HIGHEST)
 	fun onPlayerQuit(event: PlayerQuitEvent) {
 		val player = event.player
@@ -151,7 +161,6 @@ class GameListener(private val game: GameManager) : Listener {
 	fun onPlayerJoin(event: PlayerJoinEvent) {
 		val player = event.player
 		player.teleport(game.config.resolveLobbyLocation())
-
 		when (game.state) {
 			GameState.RUNNING, GameState.PAUSED -> {
 				if (player.gameMode != GameMode.CREATIVE) {
